@@ -31,6 +31,8 @@ let names = [
   "Serie 5000",
 ];
 
+let isv = [100, 200, 500, 1000, 2000, 5000];
+
 const targetDate = new Date("2024-12-31T23:59:59").getTime();
 
 const NftSingle = () => {
@@ -41,8 +43,9 @@ const NftSingle = () => {
   const [item, setItem] = useState([]);
   const [quantity, setQuantity] = useState(1);
   const [image, setImage] = useState(0);
+  const [price, setPrice] = useState(0);
 
-  const contractAddress = "0x685001BdB8fb37316053817986eC25BA126A9633";
+  const contractAddress = "0xe87686DA664Aff3c11E1DD93514c565Dd79F763F";
 
   const projectId = "e1b5abe839a71edd27768a2617f23b97";
 
@@ -130,6 +133,7 @@ const NftSingle = () => {
     const sold = await myContract.serieToSells(serie);
     const eTime = await myContract.serieToEndTime(serie);
     const date = new Date(Number(eTime) * 1000);
+    const sPrice = await myContract.getETHPrice();
     let items = {
       price: formatEther(price).slice(0, 4),
       available: available - Number(serie) * 500,
@@ -139,6 +143,7 @@ const NftSingle = () => {
     };
     setLd(false);
     setItem(items);
+    setPrice(sPrice);
   }
 
   async function mint() {
@@ -237,14 +242,22 @@ const NftSingle = () => {
             <div className="metaportal_fn_mintbox">
               <div className="mint_left">
                 <div className="mint_title">
-                  <span className={array[serie]}>Public Mint is Live</span>
+                  <span className={array[serie]}>Mint is Live</span>
                 </div>
                 <div className="mint_list">
                   <ul>
                     <li>
                       <div className="item">
-                        <h4>Price</h4>
-                        <h3>{item.price + " ETH"}</h3>
+                        <h4>Price (BV + ISV)</h4>
+                        <h3>
+                          {(
+                            Number(item.toMint) * Number(price) -
+                            isv[serie]
+                          ).toFixed(2) +
+                            " + " +
+                            isv[serie] +
+                            " USD"}
+                        </h3>
                       </div>
                     </li>
                     <li>
@@ -282,9 +295,13 @@ const NftSingle = () => {
                         <h4>Total Price</h4>
                         <h3>
                           <span className="total_price">
-                            {item.price * quantity}
+                            {(
+                              Number(item.toMint) *
+                              Number(price) *
+                              quantity
+                            ).toFixed(2)}
                           </span>{" "}
-                          ETH + GAS
+                          USD + GAS
                         </h3>
                       </div>
                     </li>
@@ -304,7 +321,7 @@ const NftSingle = () => {
               <div className="mint_right">
                 <div className="mright">
                   <div className="mint_time">
-                    <h4>Public Mint Ends In</h4>
+                    <h4>Mint Ends In</h4>
                     <Countdown
                       targetTimestamp={
                         item.endTime == undefined ? targetDate : item.endTime
@@ -315,7 +332,8 @@ const NftSingle = () => {
                   <div className="mint_info">
                     <p>
                       You need to pay a GAS fee during minting. We allow max 5
-                      mints per wallet.
+                      mints per wallet. The entire amount will be deducted in
+                      ETH.
                     </p>
                   </div>
                 </div>

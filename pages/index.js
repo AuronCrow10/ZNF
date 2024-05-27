@@ -25,7 +25,7 @@ const config = {
 const alchemy = new Alchemy(config);
 
 const Index = () => {
-  const contractAddress = "0x685001BdB8fb37316053817986eC25BA126A9633";
+  const contractAddress = "0xe87686DA664Aff3c11E1DD93514c565Dd79F763F";
 
   const projectId = "e1b5abe839a71edd27768a2617f23b97";
 

@@ -177,7 +177,7 @@ export const About2 = (isActive) => (
                           </Link>
                         </>
                       ) : (
-                        ""
+                        <h4>Not available!</h4>
                       )}
                     </div>
                   </div>

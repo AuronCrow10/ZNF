@@ -16,7 +16,15 @@ const Footer = () => {
               </a>
             </p>
           </div>
-          <div className="right_part"></div>
+          <div className="right_part">
+            <ul>
+              <li>
+                <Link href="/terms">
+                  <a className="creative_link">Terms &amp; Conditions</a>
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </footer>

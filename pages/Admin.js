@@ -38,12 +38,14 @@ const AdminPanel = () => {
   const [items, setItems] = useState([]);
   const [fee1, setFee1] = useState("");
   const [fee2, setFee2] = useState("");
-  const [perc1, setPerc1] = useState(0);
-  const [perc2, setPerc2] = useState(0);
+  const [perc1, setPerc1] = useState(1);
+  const [perc2, setPerc2] = useState(1);
   const [myContract, setContract] = useState({});
   const [eTime, setETime] = useState("");
+  const [royaltyA, setRA] = useState("");
+  const [royaltyF, setRF] = useState(0);
 
-  const contractAddress = "0x685001BdB8fb37316053817986eC25BA126A9633";
+  const contractAddress = "0xe87686DA664Aff3c11E1DD93514c565Dd79F763F";
 
   const projectId = "e1b5abe839a71edd27768a2617f23b97";
 
@@ -146,19 +148,37 @@ const AdminPanel = () => {
   }
 
   function handlePerc1(e) {
-    setPerc1(e.target.value);
-    console.log(perc1);
+    if (e.target.value > 99) {
+      setPerc1(99);
+    } else if (e.target.value < 1) {
+      setPerc1(1);
+    } else {
+      setPerc1(e.target.value);
+    }
   }
 
   function handlePerc2(e) {
-    setPerc2(e.target.value);
-    console.log(perc2);
+    if (e.target.value > 99) {
+      setPerc2(99);
+    } else if (e.target.value < 1) {
+      setPerc2(1);
+    } else {
+      setPerc2(e.target.value);
+    }
   }
 
   function handleETimeChange(e) {
     let date = new Date(e.target.value);
     setETime(Math.floor(date.getTime() / 1000));
     console.log(eTime);
+  }
+
+  function handleRoyaltyA(e) {
+    setRA(e.target.value);
+  }
+
+  function handleRoyaltyF(e) {
+    setRF(e.target.value);
   }
 
   async function pause() {
@@ -235,7 +255,8 @@ const AdminPanel = () => {
 
   async function start(id) {
     try {
-      await myContract.startSerie(eTime, id);
+      await (await myContract.startSerie(eTime, id)).wait();
+      getData();
     } catch (error) {
       alert(error);
     }
@@ -243,7 +264,16 @@ const AdminPanel = () => {
 
   async function stop(id) {
     try {
-      await myContract.stopSerie(id);
+      await (await myContract.stopSerie(id)).wait();
+      getData();
+    } catch (error) {
+      alert(error);
+    }
+  }
+
+  async function insertRoyalty() {
+    try {
+      await (await myContract.setDefaultRoyalty(royaltyA, royaltyF)).wait();
     } catch (error) {
       alert(error);
     }
@@ -570,11 +600,17 @@ const AdminPanel = () => {
                       type="number"
                       placeholder="Percentage 1"
                       onChange={(e) => handlePerc1(e)}
+                      min="1"
+                      max="99"
+                      value={perc1}
                     ></input>
                     <input
                       type="number"
                       placeholder="Percentage 2"
                       onChange={(e) => handlePerc2(e)}
+                      min="1"
+                      max="99"
+                      value={perc2}
                     ></input>
                     <span className="metaportal_fn_button" onClick={insertPerc}>
                       Insert
@@ -593,6 +629,25 @@ const AdminPanel = () => {
                       nft sells, will be splitted using the percentages between
                       the 2 wallets.
                     </p>
+                  </div>
+                  <div className="mint_time">
+                    <h4>Set Royalty Info</h4>
+                    <input
+                      type="text"
+                      placeholder="Royalty Receiver"
+                      onChange={(e) => handleRoyaltyA(e)}
+                    ></input>
+                    <input
+                      type="number"
+                      placeholder="Royalty fee"
+                      onChange={(e) => handleRoyaltyF(e)}
+                    ></input>
+                    <span
+                      className="metaportal_fn_button"
+                      onClick={insertRoyalty}
+                    >
+                      Insert
+                    </span>
                   </div>
                 </div>
               </div>
